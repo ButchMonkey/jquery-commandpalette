@@ -1,0 +1,28 @@
+{
+  "name": "jquery-commandpalette",
+  "version": "0.0.0",
+  "description": "A simple command palette plugin for jquery",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gwenaelp/jquery-commandpalette.git"
+  },
+  "keywords": [
+    "jquery",
+    "commandpalette"
+  ],
+  "author": "Gwenael Pluchon <info@gwenp.fr>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gwenaelp/jquery-commandpalette/issues"
+  },
+  "homepage": "https://github.com/gwenaelp/jquery-commandpalette",
+  "devDependencies": {
+    "broccoli": "^0.16.3",
+    "broccoli-concat": "0.0.13",
+    "broccoli-uglify-js": "^0.1.3"
+  }
+}
