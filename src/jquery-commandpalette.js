@@ -40,7 +40,6 @@
 	var table, searchFilter, elementsTemplate, allData;
 
 	$.fn.commandPalette = function (methodOrOptions) {
-		//Plugin options
 		var filteredData, onItemSelected, onFilter;
 
 		var methods = {
@@ -78,20 +77,16 @@
 
 				updateTableDOM();
 
-				searchFilter.keypress(fuzzySearch);
-
 				//TODO check if it's possible to associate an onclick event to the plugin's node
 				document.onclick = function(event) {
 					//FIXME caution, this condition could cause collision with other features, add parent check
 					if(event.toElement.id.substring(0,5) === 'item-') {
 						var selectedIndex = parseInt(event.toElement.id.substring(5), 10);
-						console.log(selectedIndex);
 						onItemSelected(allData[selectedIndex]);
 					}
 				}
 
-				//TODO check if it's possible to associate an onkeydown event to the plugin's node
-				document.onkeydown = function(event) {
+				searchFilter.keydown(function(event) {
 					var keyCode = event.keyCode;
 
 					if (keyCode == '38') {
@@ -114,14 +109,13 @@
 								next.get(0).scrollIntoView(false);
 							}
 						}
-					} else if(keyCode == '8') {
-						//refresh list when hitting carriage return key
-						fuzzySearch();
 					} else if(keyCode == '13') {
 						var selectedIndex = parseInt(table.find('.selected')[0].id.substring(5), 10);
 						onItemSelected(allData[selectedIndex]);
+					} else {
+						fuzzySearch();
 					}
-				}
+				});
 			},
 
 			/**
