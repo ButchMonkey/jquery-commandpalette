@@ -70,10 +70,10 @@
 					compileTemplateFunction(allData[i]);
 				}
 
-				this.append('<input type="text" id="searchFilter" placeholder="Search ..."><div class="table" id="results"></div>')
+				this.append('<input type="text" class="searchFilter" placeholder="Search ..."><div class="results"></div>')
 
-				table = this.find('#results');
-				searchFilter = this.find('#searchFilter').focus();
+				table = this.find('.results');
+				searchFilter = this.find('.searchFilter').focus();
 
 				updateTableDOM();
 
