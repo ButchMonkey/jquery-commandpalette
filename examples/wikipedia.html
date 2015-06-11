@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Commandpalette</title>	
+	<link rel="stylesheet" type="text/css" href="../dist/skins/default.css">
+</head>
+<body>
+	<div>
+		<h1>Wikipedia search</h1>
+		<br/>
+
+		Results are debounced by 500ms, to avoid spamming Wikipedia's API.
+		<br/>
+	</div>
+	<div id="commandpalette"></div>
+
+	<script type="text/javascript" src="./jquery.min.js"></script>
+	<script type="text/javascript" src="./fuzzy-min.js"></script>
+	<script type="text/javascript" src="../dist/jquery-commandpalette.min.js"></script>
+	<script type="text/javascript">
+		function debounce(func, wait, immediate) {
+			var timeout;
+			return function() {
+				var context = this, args = arguments;
+				var later = function() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
+		};
+
+		$(function(){
+			var debouncedFilering = debounce(function(searchTerm) {
+				$.ajax({
+					method:'get',
+					dataType: 'jsonp',
+					url: 'http://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=' + searchTerm,
+					success: function(data) {
+						console.log('results', data);
+						if(data && data.query && data.query.search) {							
+							var data = data.query.search;
+							for (var i = 0; i < data.length; i++) {
+								data[i].string = data[i].title;
+							};
+							$('#commandpalette').commandPalette('update', data);
+						} else {
+							$('#commandpalette').commandPalette('update', []);
+						}
+					}
+				});
+			}, 500)
+
+			$('#commandpalette').commandPalette({
+				items: [],
+				onFilter: debouncedFilering
+			});
+		});
+	</script>
+</body>
+</html>
