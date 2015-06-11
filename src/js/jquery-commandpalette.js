@@ -40,6 +40,8 @@
 	var table, searchFilter, elementsTemplate, allData;
 
 	$.fn.commandPalette = function (methodOrOptions) {
+		this.empty();
+		
 		var filteredData, onItemSelected, onFilter;
 
 		var methods = {
