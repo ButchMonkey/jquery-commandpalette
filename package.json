@@ -1,6 +1,6 @@
 {
   "name": "jquery-commandpalette",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A simple command palette plugin for jquery",
   "main": "index.js",
   "scripts": {

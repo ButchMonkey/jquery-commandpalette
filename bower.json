@@ -1,6 +1,6 @@
 {
   "name": "jquery-commandpalette",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "homepage": "https://github.com/gwenaelp/jquery-commandpalette",
   "description": "A simple command palette plugin for jquery",
   "moduleType": [
