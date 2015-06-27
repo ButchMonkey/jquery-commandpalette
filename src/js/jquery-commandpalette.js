@@ -40,7 +40,6 @@
 	var table, searchFilter, elementsTemplate, allData;
 
 	$.fn.commandPalette = function (methodOrOptions) {
-		this.empty();
 		
 		var filteredData, onItemSelected, onFilter;
 
@@ -50,6 +49,8 @@
 			 * @constructor
 			 */
 			init : function(options) {
+				this.empty();
+
 				elementsTemplate = options.elementsTemplate;
 				onItemSelected = options.onItemSelected;
 				onFilter = options.onFilter;
