@@ -4,7 +4,8 @@
   "description": "A simple command palette plugin for jquery",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-docs": "readme-docs -t jquery-commandpalette -i README.md -c css/prove.css && rm -Rf index.hml font css js img && mv build/* . && rm -Rf build"
   },
   "repository": {
     "type": "git",
