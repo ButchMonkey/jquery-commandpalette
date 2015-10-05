@@ -1,10 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Jquery-commandpalette</title>
-</head>
-<body>
-	<h1>Jquery-commandpalette</h1>
-</body>
+  <head>
+    <meta charset="utf8">
+    <title>jquery-commandpalette</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/prettify.css">
+    <link rel="stylesheet" href="css/docs.css">
+    <link rel="stylesheet" href="css/prove.css">
+  </head>
 </html>
+<body data-spy="scroll" data-target="#docs-navbar" data-offset="81">
+  <div id="spacer"></div>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container"><a href="/" class="brand">jquery-commandpalette</a>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="span2">
+        <div id="docs-navbar" data-spy="affix">
+          <div class="row">
+            <div class="span2">
+              <ul class="nav nav-pills nav-stacked">Initialization
+              </ul><small class="muted">Generated with <a href="https://github.com/getprove/node-bootstrap-readme-docs">readme-docs</a></small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="span10"><hr><h1 id="jquery-commandpalette"><a href="#jquery-commandpalette" name="jquery-commandpalette" id="jquery-commandpalette">jquery-commandpalette</a></h1>
+<p>A simple command palette plugin for jquery.</p>
+
+
+<pre class="prettyprint linenums"><code>    $(&#39;#element&#39;).commandpalette(options);</code></pre>
+<hr><h3 id="content-update"><a href="#content-update" name="content-update" id="content-update">Content update</a></h3>
+<pre class="prettyprint linenums"><code>    $(&#39;#element&#39;).commandpalette(&#39;update&#39;, items);</code></pre>
+<hr><h3 id="options"><a href="#options" name="options" id="options">Options</a></h3>
+<ul>
+<li>elementsTemplate (<code>string</code>, Default: <code>undefined</code>) : The template to be used for results proposals. By default, results are displayed raw.</li>
+<li>onItemSelected (<code>function(Object ResultItem)</code>) : Event triggered when an item is selected within the proposed results.</li>
+<li>onFilter(<code>function(string searchedTerm, Object ResultItem, DocumentNode selectedElement)</code>) : Event triggered when the user types a new result.</li>
+<li>items(<code>Array</code>, Default: <code>[]</code>) : Array of items used as proposals for the command palette. Items are dictionnaries that must contains a &quot;string&quot; key.</li>
+</ul>
+<hr><h3 id="templating"><a href="#templating" name="templating" id="templating">Templating</a></h3>
+<p>Templating is done with a &quot;mustachesque&quot; variant of John Resig&#39;s microtemplating library. See the <a href="https://github.com/gwenaelp/jquery-commandpalette/blob/master/examples/templates.html">dedicated example</a></p>
+<hr><h2 id="requirements"><a href="#requirements" name="requirements" id="requirements">Requirements</a></h2>
+<ul>
+<li><a href="https://github.com/mattyork/fuzzy">fuzzy-search</a>: &quot;~0.1.0&quot;</li>
+<li>jquery: &quot;~2.1.4&quot;</li>
+</ul>
+<p>You can install them automatically with the <code>bower install</code> command.</p>
+<hr><h2 id="todo-list-roadmap"><a href="#todo-list--roadmap" name="todo-list--roadmap" id="todo-list--roadmap">Todo list / Roadmap</a></h2>
+<ul>
+<li>Perfs improvements</li>
+<li>Improve testing</li>
+<li>Travis integration</li>
+</ul>
+<p>Feel free to open issues on the <a href="https://github.com/gwenaelp/jquery-commandpalette">github repository</a>.</p>
+<hr><h2 id="developper-documentation"><a href="#developper-documentation" name="developper-documentation" id="developper-documentation">Developper Documentation</a></h2>
+<hr><h3 id="initializing-environment"><a href="#initializing-environment" name="initializing-environment" id="initializing-environment">Initializing environment</a></h3>
+<pre class="prettyprint linenums"><code>$ npm install
+$ bower install</code></pre>
+<hr><h3 id="building"><a href="#building" name="building" id="building">Building</a></h3>
+<pre class="prettyprint linenums"><code>$ rm -Rf dist &amp;&amp; broccoli build dist</code></pre>
+<hr><h3 id="tests"><a href="#tests" name="tests" id="tests">Tests</a></h3>
+<p>Launch tests/index.html to see tests results.</p>
+
+      </div>
+    </div>
+  </div>
+  <script src="js/vendor/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  <script src="js/vendor/prettify.js"></script>
+  <script src="js/vendor/jquery.ba-hashchange.js"></script>
+  <script src="js/vendor/jquery.scrollTo.js"></script>
+  <script src="js/vendor/bootstrap-adjust-hash.js"></script>
+  <script src="js/main.js"></script>
+</body>
