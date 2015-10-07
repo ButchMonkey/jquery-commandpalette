@@ -1,4 +1,3 @@
-zsh:1: command not found: q
 QUnit.test( "Basic palette with five elements should have a '.results' DOM node with 5 elements", function( assert ) {
 	$('#commandpalette').commandPalette({
 		items: [{
