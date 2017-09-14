@@ -1,215 +1,254 @@
-/**
- * Copyright 2015, Gwenael Pluchon
- * Licensed under the MIT license.
- * https://github.com/gwenaelp/jquery-commandpalette
- *
- * @author Gwenaël Pluchon
- * @desc A small plugin that shows up a customizable command palette, and provide a simple API to interact with it.
- */
+(function($) {
+  /**
+   * @param {?} element
+   * @param {?} hidden_corners
+   * @return {?}
+   */
+  $.fn.visible = function(element, hidden_corners) {
+    var j = $(this).eq(0);
+    var t = j.get(0);
+    var $window = $(window);
+    var viewTop = $window.scrollTop();
+    var viewBottom = viewTop + $window.height();
+    var elemTop = j.offset().top;
+    var elemBottom = elemTop + j.height();
+    var compareTop = elemTop;
+    var compareBottom = elemBottom;
+    /** @type {boolean} */
+    var clientSize = true;
+    return!!clientSize && (compareBottom <= viewBottom && compareTop >= viewTop);
+  };
+  
+  var app;
+  var $input;
+  var element;
+  var values;
+  
+  var selectedClass = "cPalette_selected";
+  var itemClass = "cPalette_item-";
+  
+  /**
+   * @param {string} method
+   * @return {?}
+   */
+  $.fn.commandPalette = function(method) {
+    /**
+     * @param {string} data
+     * @return {?}
+     */
+    function fn(data) {
+      var param = data.tmpl || data.original.tmpl;
+      var value = data.string || data.value || '';
+      var subValue = data.subValue;
+      
+      if (typeof subValue === "undefined")
+      {
+         subValue = (!!data.original && !!data.original.subValue) ? data.original.subValue : ''; 
+      }
+      
+      param = param.replace("$$value$$", value)
+              .replace("$$subValue$$", subValue);
+      return $(param);
+    }
+    /**
+     * @return {undefined}
+     */
+    function render() {
+      app.empty();
+      /** @type {DocumentFragment} */
+      var sNode = document.createDocumentFragment();
+      if (context.length) {
+        var field = fn(context[0]).addClass(selectedClass);
+        sNode.appendChild(field.get(0));
+        /** @type {number} */
+        var i = 1;
+        var j = context.length;
+        for (;i < j;i++) {
+          field = fn(context[i]);
+          sNode.appendChild(field.get(0));
+        }
+      }
+      app.get(0).appendChild(sNode);
+    }
+    /**
+     * @return {undefined}
+     */
+    function handler() {
+      setTimeout(function() {
+        var called = {
+          pre : "<b>",
+          post : "</b>",
+          /**
+           * @param {string} content
+           * @return {?}
+           */
+          extract : function(content) {
+            return content.value;
+          }
+        };
+        context = fuzzy.filter($input[0].value, values, called);
+        if (callback) {
+          callback($input[0].value, context, $("." + selectedClass).get(0));
+        }
+        render();
+      }, 1);
+    }
+    var context;
+    var func;
+    var callback;
+    var methods = {
+      /**
+       * @param {?} args
+       * @constructor
+       */
+      init : function(args) {
+        this.empty();
+        element = args.elementsTemplate;
+        func = args.onItemSelected;
+        callback = args.onFilter;
+        values = context = args.items || [];
+        if (element) {
+          var compiled = tmpl(element);
+          /**
+           * @param {Object} data
+           * @return {undefined}
+           */
+          compileTemplateFunction = function(data) {
+            /** @type {string} */
+            data.tmpl = '<div id="' + itemClass + data.index + '">' + compiled(data) + "</div>";
+          };
+        } else {
+          /**
+           * @param {Object} data
+           * @return {undefined}
+           */
+          compileTemplateFunction = function(data) {
+            /** @type {string} */
+            data.tmpl = '<div id="' + itemClass + data.index + '">$$value$$<span class="cPalette_subvalue">$$subValue$$</span></div>';
+          };
+        }
+        /** @type {number} */
+        var i = 0;
+        var valuesLen = values.length;
+        for (;i < valuesLen;i++) {
+          /** @type {number} */
+          values[i].index = i;
+          compileTemplateFunction(values[i]);
+        }
+        this.append('<input type="text" class="cPalette_searchFilter" placeholder="Search ..."><div class="cPalette_results"></div>');
+        app = this.find(".cPalette_results");
+        $input = this.find(".cPalette_searchFilter").focus();
+        render();
+        /**
+         * @param {Event} evt
+         * @return {undefined}
+         */
+        document.onclick = function(evt) {
+          if (evt.toElement.id.substring(0, itemClass.length) === itemClass) {
+            /** @type {number} */
+            var j = parseInt(evt.toElement.id.substring(itemClass.length), 10);
+            func(values[j]);
+          }
+        };
+//        
+//        document.mouseenter = function(evt) {
+//          if (evt.toElement.id.substring(0, itemClass.length) === itemClass) {
+//             evt.addClass(selectedClass);
+//          }
+//        };
+//        
+//        document.mouseleave = function(evt) {
+//          if (evt.toElement.id.substring(0, itemClass.length) === itemClass) {
+//             evt.removeClass(selectedClass);
+//          }
+//        };
+        
+        
+        $input.keydown(function(event) {
+          var code = event.keyCode;
+          if (code == "38") {
+            var header = app.find("." + selectedClass);
+            var _self = header.prev();
+            if (_self.length) {
+              _self.addClass(selectedClass);
+              header.removeClass(selectedClass);
+              if (!_self.prev().visible()) {
+                _self.get(0).scrollIntoView();
+              }
+            }
+          } else {
+            if (code == "40") {
+              header = app.find("." + selectedClass);
+              var c = header.next();
+              if (c.length) {
+                c.addClass(selectedClass);
+                header.removeClass(selectedClass);
+                if (!c.visible()) {
+                  c.get(0).scrollIntoView(false);
+                }
+              }
+            } else {
+              if (code == "13") {
+                /** @type {number} */
+                var j = parseInt(app.find("." + selectedClass)[0].id.substring(itemClass.length), 10);
+                func(values[j]);
+              } else {
+                handler();
+              }
+            }
+          }
+        });
+      },
+      /**
+       * @param {Array} allBindingsAccessor
+       * @return {undefined}
+       */
+      update : function(allBindingsAccessor) {
+        values = context = allBindingsAccessor || [];
+        if (element) {
+          var compiled = tmpl(element);
+          /**
+           * @param {Object} data
+           * @return {undefined}
+           */
+          compileTemplateFunction = function(data) {
+            /** @type {string} */
+            console.log(data)
+            data.tmpl = '<div id="'+ itemClass + data.index + '">' + compiled(data) + "</div>";
+          };
+        } else {
+          /**
+           * @param {Object} data
+           * @return {undefined}
+           */
+          compileTemplateFunction = function(data) {
+            /** @type {string} */
+            data.tmpl = '<div id="'+ itemClass + data.index + '">$$value$$<span class="cPalette_subvalue">$$subValue$$</span></div>';
+          };
+        }
+        /** @type {number} */
+        var i = 0;
+        var valuesLen = values.length;
+        for (;i < valuesLen;i++) {
+          /** @type {number} */
+          values[i].index = i;
+          compileTemplateFunction(values[i]);
+        }
+        render();
+      }
+    };
+    if (methods[method]) {
+      return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+    } else {
+      if (typeof method === "object" || !method) {
+        return methods.init.apply(this, arguments);
+      } else {
+        $.error("Method " + method + " does not exist on jQuery.commandPalette");
+      }
+    }
+    return this;
+  };
+})(jQuery);
 
- //TODO tests
- //TODO build
- //TODO make it cross-browser
-(function($){
-	/*
-	 * Copyright 2012, Digital Fusion
-	 * Licensed under the MIT license.
-	 * http://teamdf.com/jquery-plugins/license/
-	 *
-	 * @author Sam Sehnert
-	 * @desc A small plugin that checks whether elements are within
-	 *		 the user visible viewport of a web browser.
-	 *		 only accounts for vertical position, not horizontal.
-	 */
-	$.fn.visible = function(partial,hidden){
-		
-		var $t				= $(this).eq(0),
-			t				= $t.get(0),
-			$w				= $(window),
-			viewTop			= $w.scrollTop(),
-			viewBottom		= viewTop + $w.height(),
-			_top			= $t.offset().top,
-			_bottom			= _top + $t.height(),
-			compareTop		= _top,
-			compareBottom	= _bottom,
-			clientSize		= true;
-		
-		return !!clientSize && ((compareBottom <= viewBottom) && (compareTop >= viewTop));
-	};
 
-	var table, searchFilter, elementsTemplate, allData;
-
-	$.fn.commandPalette = function (methodOrOptions) {
-		
-		var filteredData, onItemSelected, onFilter;
-
-		var methods = {
-			/**
-			 * @method init
-			 * @constructor
-			 */
-			init : function(options) {
-				this.empty();
-
-				elementsTemplate = options.elementsTemplate;
-				onItemSelected = options.onItemSelected;
-				onFilter = options.onFilter;
-				
-				allData = filteredData = options.items || [];
-
-				if(elementsTemplate) {
-					var compiledTemplate = tmpl(elementsTemplate);
-					compileTemplateFunction = function (item) {
-						item.tmpl = '<div id="item-'+ item.index +'">'+ compiledTemplate(item) +'</div>';
-					}
-				} else {
-					compileTemplateFunction = function (item) {
-						item.tmpl = '<div id="item-'+ item.index +'">$$string$$</div>';
-					}
-				}
-
-				for(var i = 0, li = allData.length; i < li; i++) {
-					allData[i].index = i;
-					compileTemplateFunction(allData[i]);
-				}
-
-				this.append('<input type="text" class="searchFilter" placeholder="Search ..."><div class="results"></div>')
-
-				table = this.find('.results');
-				searchFilter = this.find('.searchFilter').focus();
-
-				updateTableDOM();
-
-				//TODO check if it's possible to associate an onclick event to the plugin's node
-				document.onclick = function(event) {
-					//FIXME caution, this condition could cause collision with other features, add parent check
-					if(event.toElement.id.substring(0,5) === 'item-') {
-						var selectedIndex = parseInt(event.toElement.id.substring(5), 10);
-						onItemSelected(allData[selectedIndex]);
-					}
-				}
-
-				searchFilter.keydown(function(event) {
-					var keyCode = event.keyCode;
-
-					if (keyCode == '38') {
-						var selected = table.find('.selected');
-						var prev = selected.prev();
-						if(prev.length) {
-							prev.addClass('selected');
-							selected.removeClass('selected');
-							if(!prev.prev().visible()) {
-								prev.get(0).scrollIntoView();
-							}
-						}
-					} else if(keyCode == '40') {
-						var selected = table.find('.selected');
-						var next = selected.next();
-						if(next.length) {
-							next.addClass('selected');
-							selected.removeClass('selected');
-							if(!next.visible()) {
-								next.get(0).scrollIntoView(false);
-							}
-						}
-					} else if(keyCode == '13') {
-						var selectedIndex = parseInt(table.find('.selected')[0].id.substring(5), 10);
-						onItemSelected(allData[selectedIndex]);
-					} else {
-						fuzzySearch();
-					}
-				});
-			},
-
-			/**
-			 * @method update
-			 * Updates the managed items collection, and refreshes the command palette
-			 */
-			update: function(items) {
-				allData = filteredData = items || [];
-				if(elementsTemplate) {
-					//FIXME cache this var?
-					var compiledTemplate = tmpl(elementsTemplate);
-					compileTemplateFunction = function (item) {
-						item.tmpl = '<div id="item-'+ item.index +'">'+ compiledTemplate(item) +'</div>';
-					}
-				} else {
-					compileTemplateFunction = function (item) {
-						item.tmpl = '<div id="item-'+ item.index +'">$$string$$</div>';
-					}
-				}
-
-				for(var i = 0, li = allData.length; i < li; i++) {
-					allData[i].index = i;
-					compileTemplateFunction(allData[i]);
-				}
-
-				updateTableDOM();
-			}
-		};
-
-		if(methods[methodOrOptions]) {
-			return methods[methodOrOptions].apply( this, Array.prototype.slice.call(arguments, 1));
-		} else if(typeof methodOrOptions === 'object' || ! methodOrOptions) {
-			// Default to "init"
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' +  methodOrOptions + ' does not exist on jQuery.commandPalette');
-		}
-
-		/**
-		 * @function createResultElement
-		 * @private
-		 * Generates the jquery element associated to a result item
-		 */
-		function createResultElement(item) {
-			var tmpl = item.tmpl || item.original.tmpl;
-			return $(tmpl.replace('$$string$$', item.string));
-		}
-
-		/**
-		 * @function updateTableDOM
-		 * @private
-		 * Reinserts correct results in the palette's proposals
-		 */
-		function updateTableDOM() {
-			table.empty();
-			var fragment = document.createDocumentFragment();
-
-			if(filteredData.length) {
-				var el = createResultElement(filteredData[0]).addClass('selected');
-				fragment.appendChild(el.get(0));
-
-				for(var i = 1, li = filteredData.length; i < li; i++) {
-					var el = createResultElement(filteredData[i]);
-					fragment.appendChild(el.get(0));
-				}
-			}
-			table.get(0).appendChild(fragment);
-		}
-
-		/**
-		 * @function fuzzySearch
-		 * @private
-		 * Filters results displayed
-		 */
-		function fuzzySearch() {
-			//The timeout avoid getting old searchFilter value
-			setTimeout(function() {
-				var fuzzySearchOptions = {
-					pre: '<b>',
-					post: '</b>',
-					extract: function(el) { return el.string; }
-				};
-
-				filteredData = fuzzy.filter(searchFilter[0].value, allData, fuzzySearchOptions);
-				if(onFilter) {
-					onFilter(searchFilter[0].value, filteredData, $('.selected').get(0));
-				}
-				updateTableDOM();	
-			}, 1);
-		}
-
-		return this;
-	}
-}(jQuery));
+(function(){var root=this;var fuzzy={};if(typeof exports!=="undefined"){module.exports=fuzzy}else{root.fuzzy=fuzzy}fuzzy.simpleFilter=function(pattern,array){return array.filter(function(string){return fuzzy.test(pattern,string)})};fuzzy.test=function(pattern,string){return fuzzy.match(pattern,string)!==null};fuzzy.match=function(pattern,string,opts){opts=opts||{};var patternIdx=0,result=[],len=string.length,totalScore=0,currScore=0,pre=opts.pre||"",post=opts.post||"",compareString=opts.caseSensitive&&string||string.toLowerCase(),ch,compareChar;pattern=opts.caseSensitive&&pattern||pattern.toLowerCase();for(var idx=0;idx<len;idx++){ch=string[idx];if(compareString[idx]===pattern[patternIdx]){ch=pre+ch+post;patternIdx+=1;currScore+=1+currScore}else{currScore=0}totalScore+=currScore;result[result.length]=ch}if(patternIdx===pattern.length){return{rendered:result.join(""),score:totalScore}}return null};fuzzy.filter=function(pattern,arr,opts){opts=opts||{};return arr.reduce(function(prev,element,idx,arr){var str=element;if(opts.extract){str=opts.extract(element)}var rendered=fuzzy.match(pattern,str,opts);if(rendered!=null){prev[prev.length]={string:rendered.rendered,score:rendered.score,index:idx,original:element}}return prev},[]).sort(function(a,b){var compare=b.score-a.score;if(compare)return compare;return a.index-b.index})}})();
